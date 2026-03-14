@@ -1,21 +1,46 @@
-# SmartShift Roster System
+# SmartShift Roster Management System
 
-Cloud-based employee roster management system.
+A cloud-based employee roster management system developed using Spring Boot and a custom scheduling engine library.
 
-## Modules
+## Project Structure
 
-### smartshift-backend
-Spring Boot REST API.
+smartshift
+│
+├── smartshift-backend
+│   └── Spring Boot REST API
+│
+├── roster-engine
+│   └── Custom Java library for roster validation
+│
+├── build.gradle
+└── settings.gradle
 
-### roster-engine
-Custom Java library for scheduling rules:
-- shift overlap detection
-- shift time validation
-- weekly hours calculation
+## Features
 
-## Tech Stack
+- Employee management
+- Shift scheduling
+- Shift conflict detection
+- Weekly roster queries
+- Custom scheduling rule engine
+
+## Technologies
+
 - Java
 - Spring Boot
-- Gradle
+- Gradle (multi-module)
 - PostgreSQL
-- AWS
+- AWS (planned deployment)
+
+## Custom Library
+
+The project includes a separate Gradle module **roster-engine** which provides:
+
+- Shift overlap detection
+- Shift time validation
+- Weekly hour calculation
+
+This module is reused by the backend service layer.
+
+## Author
+
+Choijoo
