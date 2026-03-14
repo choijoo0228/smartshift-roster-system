@@ -1,0 +1,3 @@
+rootProject.name = 'smartshift'
+include 'smartshift-backend'
+include 'roster-engine'
