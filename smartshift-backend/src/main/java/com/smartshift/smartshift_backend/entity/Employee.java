@@ -3,6 +3,8 @@ package com.smartshift.smartshift_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "employees")
 @Getter
@@ -27,8 +29,14 @@ public class Employee {
 
     private String phoneNumber;
 
+    private LocalDate dateOfBirth;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
 
 }

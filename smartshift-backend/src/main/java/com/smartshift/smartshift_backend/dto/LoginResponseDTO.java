@@ -10,5 +10,7 @@ public class LoginResponseDTO {
     private Long  id;
     private String username;
     private Role role;
+    private Long employeeId;
     private String message;
+    private boolean firstLogin;
 }

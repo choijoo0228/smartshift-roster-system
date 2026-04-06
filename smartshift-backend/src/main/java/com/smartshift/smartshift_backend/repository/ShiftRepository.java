@@ -13,4 +13,6 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
     List<Shift> findByShiftDateBetween(LocalDate shiftDateAfter, LocalDate shiftDateBefore);
 
     List<Shift> findByAssignedEmployeeIdAndShiftDate(Long employeeId, LocalDate date);
+
+    //List<Shift> findShiftByEmployeeIdAndShiftDate(Long employeeId, LocalDate date);
 }

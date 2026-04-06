@@ -51,6 +51,9 @@ public class ShiftServiceImpl implements ShiftService {
     public Shift updateShift(Long id, Shift shift) {
         Shift existingShift = getShiftById(id);
 
+        System.out.println("::::::>>>>>>" + shift.getAssignedEmployee().getId());
+        System.out.println("::::::>>>>>>" + existingShift.getAssignedEmployee().getId());
+
         existingShift.setShiftDate(shift.getShiftDate());
         existingShift.setStartTime(shift.getStartTime());
         existingShift.setEndTime(shift.getEndTime());
@@ -83,36 +86,43 @@ public class ShiftServiceImpl implements ShiftService {
             );
         }
 
-        if (shift.getAssignedEmployee() != null && shift.getAssignedEmployee().getId() != null) {
-            Long employeeId = shift.getAssignedEmployee().getId();
+        if (shift.getAssignedEmployee() == null || shift.getAssignedEmployee().getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Assigned employee is required"
+            );
+        }
 
-            Employee employee = employeeRepository.findById(employeeId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee with id " + employeeId + " not found"
-                    ));
 
-            List<Shift> existingShifts =
-                    shiftRepository.findByAssignedEmployeeIdAndShiftDate(employeeId, shift.getShiftDate());
+        Long employeeId = shift.getAssignedEmployee().getId();
 
-            for (Shift existing : existingShifts) {
-                if (currentShiftId != null && existing.getId().equals(currentShiftId)) {
-                    continue;
-                }
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee with id " + employeeId + " not found"
+                ));
 
-                boolean overlap = shiftConflictChecker.hasOverLap(
-                        shift.getStartTime(),
-                        shift.getEndTime(),
-                        existing.getStartTime(),
-                        existing.getEndTime()
-                );
+        List<Shift> existingShifts =
+                shiftRepository.findByAssignedEmployeeIdAndShiftDate(employeeId, shift.getShiftDate());
 
-                if (overlap) {
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST, "Employee already has a shift during this time"
-                    );
-                }
+        for (Shift existing : existingShifts) {
+            if (currentShiftId != null && existing.getId().equals(currentShiftId)) {
+                continue;
             }
 
-            shift.setAssignedEmployee(employee);
+            boolean overlap = shiftConflictChecker.hasOverLap(
+                    shift.getStartTime(),
+                    shift.getEndTime(),
+                    existing.getStartTime(),
+                    existing.getEndTime()
+            );
+
+            if (overlap) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Employee already has a shift during this time"
+                );
+            }
         }
+
+        shift.setAssignedEmployee(employee);
+
     }
 }

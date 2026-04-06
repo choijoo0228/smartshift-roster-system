@@ -1,5 +1,6 @@
 package com.smartshift.smartshift_backend.service.impl;
 
+import com.smartshift.smartshift_backend.dto.EmployeeResponseDTO;
 import com.smartshift.smartshift_backend.entity.Employee;
 import com.smartshift.smartshift_backend.repository.EmployeeRepository;
 import com.smartshift.smartshift_backend.service.EmployeeService;
@@ -19,8 +20,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<EmployeeResponseDTO> getAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(emp -> new EmployeeResponseDTO(
+                        emp.getId(),
+                        emp.getFirstName(),
+                        emp.getLastName(),
+                        emp.getEmail(),
+                        emp.getPhoneNumber(),
+                        emp.getDateOfBirth(),
+                        emp.getRole(),
+                        emp.getUser() != null,
+                        emp.getUser() != null ? "Y" : "N"
+                ))
+                .toList();
     }
 
     @Override
@@ -45,6 +58,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setEmail(employee.getEmail());
         existingEmployee.setPhoneNumber(employee.getPhoneNumber());
         existingEmployee.setRole(employee.getRole());
+        existingEmployee.setDateOfBirth(employee.getDateOfBirth());
+        //existingEmployee.setUser(employee.getUser());
 
         return employeeRepository.save(existingEmployee);
     }

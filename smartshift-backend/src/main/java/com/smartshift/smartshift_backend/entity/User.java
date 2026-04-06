@@ -26,4 +26,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private boolean firstLogin;
+
 }

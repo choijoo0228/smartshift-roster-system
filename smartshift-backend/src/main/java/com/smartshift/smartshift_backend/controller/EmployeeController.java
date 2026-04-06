@@ -1,5 +1,6 @@
 package com.smartshift.smartshift_backend.controller;
 
+import com.smartshift.smartshift_backend.dto.EmployeeResponseDTO;
 import com.smartshift.smartshift_backend.entity.Employee;
 import com.smartshift.smartshift_backend.service.EmployeeService;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<Employee> getAllEmployees() {
+    public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 

@@ -38,4 +38,4 @@ public class Shift {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Employee assignedEmployee;
 
-}
+};
