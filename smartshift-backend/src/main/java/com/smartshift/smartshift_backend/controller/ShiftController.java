@@ -1,13 +1,10 @@
 package com.smartshift.smartshift_backend.controller;
 
-import com.smartshift.smartshift_backend.entity.Employee;
+import com.smartshift.smartshift_backend.dto.ShiftRequestDTO;
 import com.smartshift.smartshift_backend.entity.Shift;
-import com.smartshift.smartshift_backend.repository.EmployeeRepository;
-import com.smartshift.smartshift_backend.repository.ShiftRepository;
 import com.smartshift.smartshift_backend.service.ShiftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,8 +32,9 @@ public class ShiftController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Shift createShift(@RequestBody Shift shift) {
-        return shiftService.createShift(shift);
+    public Shift createShift(@RequestBody ShiftRequestDTO shiftDTO) {
+        System.out.println("::::::>>>>>>" + shiftDTO.isPublished());
+        return shiftService.createShift(shiftDTO);
     }
 
     @PutMapping("/{id}")
@@ -58,6 +56,16 @@ public class ShiftController {
     @GetMapping("/week")
     public List<Shift> getShiftsByBetweenDates(@RequestParam LocalDate startDate,@RequestParam LocalDate endDate) {
         return shiftService.getShiftsForWeek(startDate, endDate);
+    }
+
+    @PostMapping("/publish-week")
+    public void publishWeek(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        shiftService.publishWeek(startDate, endDate);
+    }
+
+    @GetMapping("/published/week")
+    public List<Shift> getPublishedShiftsForWeek(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        return shiftService.getPublishedShiftsForWeek(startDate, endDate);
     }
 
 }

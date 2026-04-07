@@ -1,6 +1,7 @@
 package com.smartshift.smartshift_backend.repository;
 
 import com.smartshift.smartshift_backend.entity.Shift;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -14,5 +15,6 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
 
     List<Shift> findByAssignedEmployeeIdAndShiftDate(Long employeeId, LocalDate date);
 
-    //List<Shift> findShiftByEmployeeIdAndShiftDate(Long employeeId, LocalDate date);
+    List<Shift> findByShiftDateBetweenAndPublishedTrue(LocalDate shiftDateAfter, LocalDate shiftDateBefore);
+
 }

@@ -2,10 +2,13 @@ package com.smartshift.smartshift_backend.service.impl;
 
 import com.smartshift.rosterenigne.ShiftTimeValidator;
 import com.smartshift.rosterenigne.ShiftConflictChecker;
+import com.smartshift.smartshift_backend.dto.ShiftRequestDTO;
 import com.smartshift.smartshift_backend.entity.Employee;
 import com.smartshift.smartshift_backend.entity.Shift;
 import com.smartshift.smartshift_backend.repository.EmployeeRepository;
 import com.smartshift.smartshift_backend.repository.ShiftRepository;
+import com.smartshift.smartshift_backend.service.EmployeeService;
+import com.smartshift.smartshift_backend.service.NotificationService;
 import com.smartshift.smartshift_backend.service.ShiftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class ShiftServiceImpl implements ShiftService {
 
     private final ShiftConflictChecker shiftConflictChecker = new ShiftConflictChecker();
     private final ShiftTimeValidator shiftTimeValidator = new ShiftTimeValidator();
+    private final NotificationService notificationService = new NotificationServiceImpl();
 
     public ShiftServiceImpl(ShiftRepository shiftRepository, EmployeeRepository employeeRepository) {
         this.shiftRepository = shiftRepository;
@@ -42,7 +46,14 @@ public class ShiftServiceImpl implements ShiftService {
     }
 
     @Override
-    public Shift createShift(Shift shift) {
+    public Shift createShift(ShiftRequestDTO shiftDTO) {
+        Shift shift = new Shift();
+        shift.setShiftDate(shiftDTO.getShiftDate());
+        shift.setPublished(shiftDTO.isPublished());
+        shift.setAssignedEmployee(shiftDTO.getAssignedEmployee());
+        shift.setStartTime(shiftDTO.getStartTime());
+        shift.setEndTime(shiftDTO.getEndTime());
+        shift.setRoleRequired(shiftDTO.getRoleRequired());
         validateShift(shift, null);
         return shiftRepository.save(shift);
     }
@@ -78,6 +89,39 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     public List<Shift> getShiftsForWeek(LocalDate start, LocalDate end) {
         return shiftRepository.findByShiftDateBetween(start, end);
+    }
+
+    @Override
+    public void publishWeek(LocalDate start, LocalDate end) {
+        List<Shift> shifts = shiftRepository.findByShiftDateBetween(start, end);
+
+        if (shifts.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No shifts found for the selected week");
+        }
+
+        boolean allAlreadyPublished = shifts.stream().allMatch(Shift::isPublished);
+
+        if(allAlreadyPublished) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All shifts for this week are already published");
+        }
+
+        for (Shift shift : shifts) {
+            shift.setPublished(true);
+            shiftRepository.save(shift);
+
+            if (shift.getAssignedEmployee() != null && shift.getAssignedEmployee().getEmail() != null) {
+                try {
+                    notificationService.sendShiftPublishedEmail(shift);
+                } catch (Exception e) {
+                    System.out.println("SES send failed: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Shift> getPublishedShiftsForWeek(LocalDate start, LocalDate end) {
+        return shiftRepository.findByShiftDateBetweenAndPublishedTrue(start, end);
     }
 
     private void validateShift(Shift shift, Long currentShiftId) {

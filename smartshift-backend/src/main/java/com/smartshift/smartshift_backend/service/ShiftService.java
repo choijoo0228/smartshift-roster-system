@@ -1,5 +1,6 @@
 package com.smartshift.smartshift_backend.service;
 
+import com.smartshift.smartshift_backend.dto.ShiftRequestDTO;
 import com.smartshift.smartshift_backend.entity.Shift;
 
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ public interface ShiftService {
 
     Shift getShiftById(Long id);
 
-    Shift createShift(Shift shift);
+    Shift createShift(ShiftRequestDTO shiftDTO);
 
     Shift updateShift(Long id, Shift shift);
 
@@ -20,4 +21,8 @@ public interface ShiftService {
     List<Shift> getShiftsByDate(LocalDate shiftDate);
 
     List<Shift> getShiftsForWeek(LocalDate start, LocalDate end);
+
+    void publishWeek(LocalDate start, LocalDate end);
+
+    List<Shift> getPublishedShiftsForWeek(LocalDate start, LocalDate end);
 }
